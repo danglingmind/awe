@@ -25,8 +25,11 @@ model User {
   // Optional for WebAuthn support
   Authenticator Authenticator[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Board       Board[]
+  Testimonial Testimonial[]
+  Form        Form[]
 }
 
 model Account {
@@ -102,6 +105,8 @@ model SubscriptionType {
   price        Float
   discount     Float?
   Subscription Subscription[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   @@unique([name])
 }
@@ -114,11 +119,13 @@ model Board {
   Active      Boolean
   Tags        Tag[]
   EmbedLink   String?
+  user        User    @relation(fields: [userId], references: [id])
 
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   Testimonial   Testimonial? @relation(fields: [testimonialId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   testimonialId String?      @db.ObjectId
+  userId        String       @db.ObjectId
 
   @@unique([name])
 }
@@ -129,7 +136,6 @@ model Testimonial {
   Description       String?
   Tags              Tag[]
   Theme             Theme           @relation(fields: [themeId], references: [id])
-  isForm            Boolean
   Active            Boolean
   Boards            Board[]
   PermissionToShare Boolean?
@@ -137,11 +143,31 @@ model Testimonial {
   VideoUploaded     Boolean?
   ImageLink         String?
   VideoLink         String?
-  UserEmail         String
+  Rating            Int?
+  createdByEmaail   String
   SocialAccounts    SocialAccount[]
   Verified          Boolean?
+  user              User            @relation(fields: [userId], references: [id])
 
-  themeId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  themeId   String   @db.ObjectId
+  userId    String   @db.ObjectId
+}
+
+model Form {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  title             String
+  description       String
+  questions         String[]
+  enableImageUpload Boolean
+  enableVideoUpload Boolean
+  enableRating      Boolean
+
+  createdBy User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String   @db.ObjectId
 }
 
 model Theme {

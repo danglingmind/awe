@@ -13,7 +13,7 @@ export const authConfig = {
       const { pathname } = request.nextUrl;
       let isProtected = false;
 
-      const protectedPathsPrefix = ["/ui/"];
+      const protectedPathsPrefix = ["/dashboard"];
       protectedPathsPrefix.forEach((prefix) => {
         if (pathname.startsWith(prefix)) {
           isProtected = true;
@@ -21,6 +21,18 @@ export const authConfig = {
       });
       if (isProtected) return !!auth;
       return true;
+    },
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.id = String(token.sub);
+      }
+      return session;
+    },
+    jwt: async ({ user, token }) => {
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
     },
   },
   adapter: PrismaAdapter(prisma),
