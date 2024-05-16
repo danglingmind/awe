@@ -4,8 +4,7 @@ import NewButton from "../new-button";
 import { useState } from "react";
 import TestimonialModal from "./modal/testimonial-modal";
 import TestimonialFormModal from "./modal/testimonial-form-modal";
-import { CreateAweForm } from "../../create-awe-form";
-import Modal from "../../modal";
+import { Avatar } from "./avatar";
 
 export default function NavBar() {
   const [showNewAweModal, setShowNewAweModal] = useState(false);
@@ -95,12 +94,7 @@ export default function NavBar() {
               role="button"
               className="btn btn-ghost btn-circle avatar"
             >
-              <div className="w-10 rounded-full">
-                <img
-                  alt="Tailwind CSS Navbar component"
-                  src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-                />
-              </div>
+              <Avatar />
             </div>
             <ul
               tabIndex={0}

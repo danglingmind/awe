@@ -85,6 +85,7 @@ export async function getAllFormsForUser(userId?: string): Promise<Form[]> {
   try {
     forms = await prisma.form.findMany({
       where: { userId: userId },
+      orderBy: { updatedAt: "desc" },
     });
   } catch (error) {
     console.log(error);

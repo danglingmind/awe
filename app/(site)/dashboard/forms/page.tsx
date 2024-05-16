@@ -66,7 +66,11 @@ export default function Forms() {
           setVisible={setShowModal}
           header={"Edit Form"}
         >
-          <CreateAweForm onCancel={closeModal} form={selectedForm} />
+          <CreateAweForm
+            onCancel={closeModal}
+            onSubmit={closeModal}
+            form={selectedForm}
+          />
         </Modal>
       )}
     </>

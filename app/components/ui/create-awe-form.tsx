@@ -21,12 +21,13 @@ export function CreateAweForm({
   onSubmit,
   form,
 }: CreateAweFormProps) {
-  const [questions, setQuestions] = useState<string[]>([]);
+  console.log(form);
+  const [questions, setQuestions] = useState<string[]>(form?.questions ?? []);
   const [customQueInput, setCustomQueInput] = useState<string>("");
   const session = useSession();
   const formRef = useRef<HTMLFormElement>(null);
 
-  // set the custom questions list if form is provided
+  // TODO: set the custom questions list if form is provided
 
   const clearForm = async () => {
     setQuestions([]);
@@ -136,6 +137,7 @@ export function CreateAweForm({
             <input
               type="checkbox"
               name="enable_rating"
+              defaultChecked={form?.enableRating ?? false}
               className="checkbox checkbox-primary"
             />
           </label>
@@ -146,6 +148,7 @@ export function CreateAweForm({
             <input
               type="checkbox"
               name="enable_image"
+              defaultChecked={form?.enableImageUpload ?? false}
               className="checkbox checkbox-primary"
             />
           </label>
@@ -156,6 +159,7 @@ export function CreateAweForm({
             <input
               type="checkbox"
               name="enable_video"
+              defaultChecked={form?.enableVideoUpload ?? false}
               className="checkbox checkbox-primary"
             />
           </label>
