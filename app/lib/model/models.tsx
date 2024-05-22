@@ -21,12 +21,25 @@ export interface TestimonialModel {
   userId: string;
 }
 
-export interface BoardModel {}
+export interface BoardModel {
+  id: string;
+  name: string;
+  description: string;
+  active: boolean;
+  themes: ThemeModel[];
+  tags: TagModel[];
+  userId: string;
+  embedLink?: string;
+}
 
 export interface TagModel {
+  id: string;
   name: string;
 }
 
-export interface ThemeModel {}
+export interface ThemeModel {
+  id: string;
+  name: string;
+}
 
 export interface SocialAccountModel {}

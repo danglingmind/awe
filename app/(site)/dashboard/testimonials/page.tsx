@@ -32,15 +32,15 @@ export default function Testimonials() {
             const link =
               "/dashboard/testimonials/testimonial?id=" + testimonial.id;
             return (
-              <Link key={testimonial.id + "_" + testimonial.Name} href={link}>
+              <Link key={testimonial.id + "_" + testimonial.name} href={link}>
                 <TestimonialCard
                   id={testimonial.id}
                   userId={testimonial.userId}
-                  title={testimonial.Name ?? ""}
+                  title={testimonial.name ?? ""}
                   userName={testimonial.userId}
-                  description={testimonial.Description ?? ""}
+                  description={testimonial.description ?? ""}
                   isNew={false}
-                  tags={testimonial?.Tags?.map((t) => t.name)}
+                  tags={testimonial?.tags?.map((t) => t.name)}
                 />
               </Link>
             );

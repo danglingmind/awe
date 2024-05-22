@@ -94,3 +94,38 @@ export async function getAllFormsForUser(userId?: string): Promise<Form[]> {
 
   return forms;
 }
+
+export async function deleteForm(formId: string, userId: string) {
+  if (!userId?.trim()) {
+    throw new Error("user ID is requried");
+  }
+
+  prisma.form
+    .delete({
+      where: {
+        userId: userId,
+        id: formId,
+      },
+    })
+    .then(() => {
+      return true;
+    })
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export async function getForm(formId: string) {
+  return prisma.form
+    .findFirst({
+      where: {
+        id: formId,
+      },
+    })
+    .then((form) => {
+      return form;
+    })
+    .catch((err) => {
+      throw err;
+    });
+}

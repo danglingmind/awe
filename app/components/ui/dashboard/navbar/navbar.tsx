@@ -5,32 +5,29 @@ import { useState } from "react";
 import TestimonialModal from "./modal/testimonial-modal";
 import TestimonialFormModal from "./modal/testimonial-form-modal";
 import { Avatar } from "./avatar";
+import BoardFormModal from "./modal/board-modal";
 
 export default function NavBar() {
   const [showNewAweModal, setShowNewAweModal] = useState(false);
-  const [showNewBoardModal, setShowNewBoardModal] = useState(false);
   const [showNewTagModal, setShowNewTagModal] = useState(false);
   const [showNewFromModal, setShowNewFormModal] = useState(false);
+  const [showBoardFromModal, setShowBoardFormModal] = useState(false);
 
   function toggleAweModal() {
     setShowNewAweModal(!showNewAweModal);
     document.getElementById("new_awe_modal")?.showModal();
   }
 
-  function toggleBoardModal() {
-    setShowNewBoardModal(!showNewBoardModal);
+  function openBoardFormModal() {
+    setShowBoardFormModal(true);
   }
 
-  function toggleTagModal() {
-    setShowNewTagModal(!showNewTagModal);
+  function openTagModal() {
+    setShowNewTagModal(true);
   }
 
   function openNewFormModal() {
     setShowNewFormModal(true);
-  }
-
-  function closeNewFormModal() {
-    setShowNewFormModal(false);
   }
 
   return (
@@ -45,8 +42,8 @@ export default function NavBar() {
           <NewButton
             key={"new-button-navbar"}
             openNewAweModal={toggleAweModal}
-            openNewBoardModal={toggleBoardModal}
-            openNewTagModal={toggleTagModal}
+            openNewBoardModal={openBoardFormModal}
+            openNewTagModal={openTagModal}
             openNewFormModal={openNewFormModal}
           />
           <div className="dropdown dropdown-end">
@@ -120,6 +117,10 @@ export default function NavBar() {
       <TestimonialFormModal
         visible={showNewFromModal}
         setVisible={setShowNewFormModal}
+      />
+      <BoardFormModal
+        visible={showBoardFromModal}
+        setVisible={setShowBoardFormModal}
       />
     </div>
   );

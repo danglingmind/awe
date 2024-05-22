@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { Placeholders } from "./constants";
-import { SubmitButton } from "./submit-button";
+import { Placeholders } from "../../constants";
+import { SubmitButton } from "../../common/submit-button";
 import updateForm, {
   createTestimonialForm,
 } from "@/app/lib/actions/form.actions";
@@ -21,13 +21,10 @@ export function CreateAweForm({
   onSubmit,
   form,
 }: CreateAweFormProps) {
-  console.log(form);
   const [questions, setQuestions] = useState<string[]>(form?.questions ?? []);
   const [customQueInput, setCustomQueInput] = useState<string>("");
   const session = useSession();
   const formRef = useRef<HTMLFormElement>(null);
-
-  // TODO: set the custom questions list if form is provided
 
   const clearForm = async () => {
     setQuestions([]);
@@ -53,8 +50,6 @@ export function CreateAweForm({
     questions?.map((que) => formData.append("question", que));
 
     // call server actions
-    console.log(form?.id?.trim() ? "id" : "blank");
-
     form?.id?.trim() ? updateForm(formData) : createTestimonialForm(formData);
     clearForm();
     onSubmit && onSubmit();

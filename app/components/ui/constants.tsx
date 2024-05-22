@@ -1,4 +1,5 @@
 export enum Placeholders {
+  ENTER_NAME = "Enter a name.",
   ENTER_TESTIMONIAL_TITLE = "Enter a title for testimonial",
   ENTER_YOUR_THOUGHTS = "Please enter your thoughts.",
   ENTER_YOUR_EMAIL = "Enter your email",

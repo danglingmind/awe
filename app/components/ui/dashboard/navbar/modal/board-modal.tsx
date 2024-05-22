@@ -1,16 +1,16 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { CreateAweForm } from "../../forms/create-awe-form";
+import { CreateBoardForm } from "../../boards/board-form";
 import Modal from "../../../common/modal";
 
-export interface TestimonialFormModalProps {
+export interface BoardFormModalProps {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function TestimonialFormModal({
+export default function BoardFormModal({
   visible,
   setVisible,
-}: TestimonialFormModalProps) {
+}: BoardFormModalProps) {
   const hideModal = () => {
     setVisible(false);
   };
@@ -18,10 +18,10 @@ export default function TestimonialFormModal({
   return (
     <Modal
       visible={visible}
-      header="Create a new AWE form"
+      header="Create a new Board"
       setVisible={setVisible}
     >
-      <CreateAweForm onSubmit={hideModal} onCancel={hideModal} />
+      <CreateBoardForm onSubmit={hideModal} onCancel={hideModal} />
     </Modal>
   );
 }

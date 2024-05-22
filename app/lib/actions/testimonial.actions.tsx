@@ -66,11 +66,6 @@ export async function getAllTestimonialsForUser(
   return testimonials;
 }
 
-export async function testFormAction(formData: FormData) {
-  console.log(formData);
-  return true;
-}
-
 /**
  * Deletes a testimonial
  * @param id testimonial ID to delete

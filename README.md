@@ -41,3 +41,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 - Prisma (PrismaAdapter, PrismaClient, Prisma)
 - Auth.js (NextAuth@beta)
+
+### seed the db with
+
+> npx prisma db seed

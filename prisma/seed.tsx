@@ -20,4 +20,25 @@ function seedTestimonial() {
     .catch((e) => console.error("error in seed", e));
 }
 
-seedTestimonial();
+// seedTestimonial();
+
+function seedTheme() {
+  const themes = [
+    {
+      name: "Mario",
+    },
+    {
+      name: "Batman",
+    },
+    {
+      name: "Naruto",
+    },
+  ];
+
+  prisma.theme
+    .createMany({ data: themes })
+    .then(() => console.info("inserted"))
+    .catch((e) => console.error("error in seed", e));
+}
+
+seedTheme();

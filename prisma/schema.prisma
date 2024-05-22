@@ -112,47 +112,52 @@ model SubscriptionType {
 }
 
 model Board {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  Description String?
-  Themes      Theme[]
-  Active      Boolean
-  Tags        Tag[]
-  EmbedLink   String?
-  user        User    @relation(fields: [userId], references: [id])
-
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  Testimonial   Testimonial? @relation(fields: [testimonialId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  testimonialId String?      @db.ObjectId
-  userId        String       @db.ObjectId
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  active         Boolean
+  embedLink      String?
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  // m-n relations
+  testimonialIDs String[]      @db.ObjectId
+  testimonials   Testimonial[] @relation(fields: [testimonialIDs], references: [id])
+  themeIDs       String[]      @db.ObjectId
+  themes         Theme[]       @relation(fields: [themeIDs], references: [id])
+  tagIDs         String[]      @db.ObjectId
+  tags           Tag[]         @relation(fields: [tagIDs], references: [id])
 
   @@unique([name])
 }
 
 model Testimonial {
-  id                String          @id @default(auto()) @map("_id") @db.ObjectId
-  Name              String?
-  Description       String?
-  Tags              Tag[]
-  Theme             Theme           @relation(fields: [themeId], references: [id])
-  Active            Boolean
-  Boards            Board[]
-  PermissionToShare Boolean?
-  ImageUploaded     Boolean?
-  VideoUploaded     Boolean?
-  ImageLink         String?
-  VideoLink         String?
-  Rating            Int?
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  name              String?
+  description       String?
+  active            Boolean
+  permissionToShare Boolean?
+  imageUploaded     Boolean?
+  videoUploaded     Boolean?
+  imageLink         String?
+  videoLink         String?
+  rating            Int?
   createdByEmaail   String
-  SocialAccounts    SocialAccount[]
-  Verified          Boolean?
-  user              User            @relation(fields: [userId], references: [id])
+  verified          Boolean?
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String   @db.ObjectId
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  // m-n relations
+  tagIDs            String[] @db.ObjectId
+  tags              Tag[]    @relation(fields: [tagIDs], references: [id])
+  themeIDs          String[] @db.ObjectId
+  themes            Theme[]  @relation(fields: [themeIDs], references: [id])
+  boardIDs          String[] @db.ObjectId
+  boards            Board[]  @relation(fields: [boardIDs], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  themeId   String   @db.ObjectId
-  userId    String   @db.ObjectId
+  socialAccounts SocialAccount[]
 }
 
 model Form {
@@ -165,19 +170,22 @@ model Form {
   enableRating      Boolean
 
   createdBy User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String   @db.ObjectId
 }
 
 model Theme {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Board       Board?        @relation(fields: [boardId], references: [id])
-  boardId     String?       @db.ObjectId
-  Testimonial Testimonial[]
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // m-n relations
+  boardIDs       String[]      @db.ObjectId
+  boards         Board[]       @relation(fields: [boardIDs], references: [id])
+  testimonialIDs String[]      @db.ObjectId
+  testimonials   Testimonial[] @relation(fields: [testimonialIDs], references: [id])
 
   @@unique([name])
 }
@@ -186,12 +194,14 @@ model Tag {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  Board         Board?       @relation(fields: [boardId], references: [id])
-  boardId       String?      @db.ObjectId
-  Testimonial   Testimonial? @relation(fields: [testimonialId], references: [id])
-  testimonialId String?      @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // m-n relations
+  boardIDs       String[]      @db.ObjectId
+  boards         Board[]       @relation(fields: [boardIDs], references: [id])
+  testimonialIDs String[]      @db.ObjectId
+  testimonials   Testimonial[] @relation(fields: [testimonialIDs], references: [id])
 
   @@unique([name])
 }

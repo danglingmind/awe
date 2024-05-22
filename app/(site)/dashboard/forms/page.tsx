@@ -3,9 +3,15 @@ import { useSession } from "next-auth/react";
 import { Form } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { getAllFormsForUser } from "@/app/lib/actions/form.actions";
-import Modal from "@/app/components/ui/modal";
-import { CreateAweForm } from "@/app/components/ui/create-awe-form";
-import { Eye, Pencil } from "lucide-react";
+import Modal from "@/app/components/ui/common/modal";
+import { CreateAweForm } from "@/app/components/ui/dashboard/forms/create-awe-form";
+import { Eye, Pencil, Link } from "lucide-react";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { FORMS_TABLE_COLUMNS } from "@/app/components/ui/dashboard/forms/table/columns";
 
 export default function Forms() {
   const session = useSession();
@@ -33,8 +39,46 @@ export default function Forms() {
     setShowModal(false);
   };
 
+  const table = useReactTable({
+    data: forms,
+    columns: FORMS_TABLE_COLUMNS,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <>
+      {/* <div className="overflow-x-auto m-3 border border-white">
+        <table className="table">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="hover">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div> */}
+
       <div className="flex flex-row gap-3 flex-wrap m-5">
         {forms.map((form) => (
           <div
@@ -46,6 +90,19 @@ export default function Forms() {
               <h2 className="card-title">{form.title}</h2>
               <p>{form.description}</p>
               <div className="card-actions justify-end">
+                <div className="tooltip" data-tip="copy embed link">
+                  <button
+                    className="btn btn-circle btn-sm"
+                    onClick={() => {
+                      const baseUrl = window.location.origin;
+                      navigator.clipboard.writeText(
+                        `${baseUrl}/form/${form.id}`
+                      );
+                    }}
+                  >
+                    <Link />
+                  </button>
+                </div>
                 <button className="btn btn-circle btn-sm">
                   <Eye />
                 </button>
