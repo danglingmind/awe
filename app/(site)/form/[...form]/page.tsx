@@ -32,19 +32,23 @@ export default function TestimonialSubmitForm() {
             type="email"
             required
             placeholder="Email"
-            className="input w-full"
+            className="input input-bordered w-full"
           />
           <input
             name="name"
             type="text"
             required
             placeholder="Name"
-            className="input w-full"
+            className="input input-bordered w-full"
           />
           {form.questions?.map((que, index) => (
             <div key={index} className="flex flex-col gap-3">
               <div className="label">{`${que} ?`}</div>
-              <input type="text" className="input w-full" />
+              <input
+                name={que}
+                type="text"
+                className="input input-bordered w-full"
+              />
             </div>
           ))}
 
