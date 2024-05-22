@@ -17,6 +17,10 @@ function validateFindUniqueTestimonialInput(id: string) {
   });
 }
 
+export async function testForm(formData: FormData) {
+  console.log(formData);
+}
+
 /**
  * Get given testimonial for user
  * @param testimonialId testimonial ID

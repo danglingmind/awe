@@ -14,6 +14,10 @@ export interface ModalProps {
    * Header of the modal.
    */
   header?: ReactNode;
+  /**
+   * Enable outside click to cancel the modal.
+   */
+  outsideClick?: boolean;
 }
 
 export default function Modal({
@@ -21,13 +25,19 @@ export default function Modal({
   children,
   visible,
   setVisible,
+  outsideClick,
 }: ModalProps) {
+  const enableOutsideClick =
+    outsideClick === undefined || outsideClick === true ? true : false;
   return (
     visible && (
       <div
         id="container"
         onClick={(e) => {
-          e.target.id === "container" && setVisible && setVisible(false);
+          enableOutsideClick &&
+            e.target.id === "container" &&
+            setVisible &&
+            setVisible(false);
         }}
         // TODO: add animation in the trasition of modal
         className="fixed left-0 top-0 w-full h-full flex flex-col items-center justify-center z-10 backdrop-blur-sm"

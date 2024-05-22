@@ -2,22 +2,26 @@
 import { useSession } from "next-auth/react";
 import { Form } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { getAllFormsForUser } from "@/app/lib/actions/form.actions";
+import { getAllFormsForUser, deleteForm } from "@/app/lib/actions/form.actions";
 import Modal from "@/app/components/ui/common/modal";
 import { CreateAweForm } from "@/app/components/ui/dashboard/forms/create-awe-form";
-import { Eye, Pencil, Link } from "lucide-react";
+import { Eye, Pencil, Link, Delete, Trash } from "lucide-react";
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { FORMS_TABLE_COLUMNS } from "@/app/components/ui/dashboard/forms/table/columns";
+import TestimonialSubmitFormComponent from "@/app/components/ui/testimonial/testimonial-submit";
 
 export default function Forms() {
   const session = useSession();
+  const [refresh, setRefresh] = useState(false);
   const [forms, setForms] = useState<Form[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedForm, setSelectedForm] = useState<Form>();
+
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,7 +32,11 @@ export default function Forms() {
     if (session?.data?.user?.id) {
       fetchData();
     }
-  }, [session?.data?.user?.id]);
+  }, [session?.data?.user?.id, refresh]);
+
+  const refreshData = () => {
+    setRefresh(!refresh);
+  };
 
   const openModal = (form: Form) => {
     setSelectedForm(form);
@@ -39,11 +47,25 @@ export default function Forms() {
     setShowModal(false);
   };
 
+  const openPreviewModal = (form: Form) => {
+    setSelectedForm(form);
+    setShowPreviewModal(true);
+  };
+  const closePreviewModal = () => {
+    setSelectedForm({} as Form);
+    setShowPreviewModal(false);
+  };
+
   const table = useReactTable({
     data: forms,
     columns: FORMS_TABLE_COLUMNS,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const deleteFormAction = async (formID: string) => {
+    deleteForm(formID, session?.data?.user?.id ?? "");
+    refreshData();
+  };
 
   return (
     <>
@@ -100,18 +122,33 @@ export default function Forms() {
                       );
                     }}
                   >
-                    <Link />
+                    <Link className="w-4 h-4" />
                   </button>
                 </div>
-                <button className="btn btn-circle btn-sm">
-                  <Eye />
-                </button>
-                <button
-                  className="btn btn-circle btn-sm"
-                  onClick={() => openModal(form)}
-                >
-                  <Pencil />
-                </button>
+                <div className="tooltip" data-tip="preview">
+                  <button
+                    className="btn btn-circle btn-sm"
+                    onClick={() => openPreviewModal(form)}
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="tooltip" data-tip="edit form">
+                  <button
+                    className="btn btn-circle btn-sm"
+                    onClick={() => openModal(form)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="tooltip" data-tip="delete form">
+                  <button
+                    className="btn btn-circle btn-sm"
+                    onClick={() => deleteFormAction(form?.id)}
+                  >
+                    <Trash className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -119,6 +156,7 @@ export default function Forms() {
       </div>
       {showModal && (
         <Modal
+          outsideClick={false}
           visible={showModal}
           setVisible={setShowModal}
           header={"Edit Form"}
@@ -128,6 +166,15 @@ export default function Forms() {
             onSubmit={closeModal}
             form={selectedForm}
           />
+        </Modal>
+      )}
+      {showPreviewModal && (
+        <Modal
+          visible={showPreviewModal}
+          setVisible={setShowPreviewModal}
+          header={"Testimonial Preview"}
+        >
+          <TestimonialSubmitFormComponent form={selectedForm} />
         </Modal>
       )}
     </>
