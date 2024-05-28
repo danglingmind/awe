@@ -4,9 +4,7 @@ import { Board } from "@prisma/client";
 import { BoardModel } from "../model/models";
 import prisma from "../prismaClient";
 
-export async function createBoard(board: BoardModel, formData: FormData) {
-  console.log(formData);
-
+export async function createBoard(board: BoardModel) {
   const themesConnectOrCreate = board.themes.map((theme) => {
     return {
       where: { id: theme.id },
@@ -16,8 +14,6 @@ export async function createBoard(board: BoardModel, formData: FormData) {
       },
     };
   });
-
-  console.log(themesConnectOrCreate);
 
   const tagsConnectOrCreate = board.tags?.map((tag) => {
     return {

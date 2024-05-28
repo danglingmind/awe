@@ -17,6 +17,7 @@ export default function Testimonials() {
     const fetchData = async () => {
       const data = await getAllTestimonialsForUser(session.data?.user?.id);
       setTestimonials(data);
+      console.log(data);
     };
 
     if (session.data?.user?.id) {
@@ -33,15 +34,7 @@ export default function Testimonials() {
               "/dashboard/testimonials/testimonial?id=" + testimonial.id;
             return (
               <Link key={testimonial.id + "_" + testimonial.name} href={link}>
-                <TestimonialCard
-                  id={testimonial.id}
-                  userId={testimonial.userId}
-                  title={testimonial.name ?? ""}
-                  userName={testimonial.userId}
-                  description={testimonial.description ?? ""}
-                  isNew={false}
-                  tags={testimonial?.tags?.map((t) => t.name)}
-                />
+                <div className="bg-base-100">{testimonial.name}</div>
               </Link>
             );
           })}

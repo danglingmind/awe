@@ -57,7 +57,7 @@ export function CreateBoardForm({
     board.tags = [];
 
     // call server action
-    board?.id?.trim() ? updateBoard(board) : createBoard(board, formData);
+    board?.id?.trim() ? updateBoard(board) : createBoard(board);
 
     clearForm();
     onSubmit && onSubmit();

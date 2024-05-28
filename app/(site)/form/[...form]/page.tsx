@@ -21,5 +21,9 @@ export default function TestimonialSubmitForm() {
 
     fetchData();
   }, [formId]);
-  return <TestimonialSubmitFormComponent form={form} />;
+  return (
+    <div className="mx-32 px-48">
+      <TestimonialSubmitFormComponent form={form} />
+    </div>
+  );
 }

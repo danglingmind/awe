@@ -6,4 +6,6 @@ export enum Placeholders {
   ENTER_YOUR_FNAME = "Enter first name",
   ENTER_YOUR_LNAME = "Enter last name",
   ADD_QUE = "Add your custom question here and click add",
+  SHARE_PERMISSION = "Share this form with others",
+  PICK_A_BOARD = "Pick boards for testimonial",
 }

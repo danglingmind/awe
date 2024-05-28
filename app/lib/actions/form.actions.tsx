@@ -1,5 +1,5 @@
 "use server";
-import { Form } from "@prisma/client";
+import { Form, Prisma, Question } from "@prisma/client";
 // TODO: IMPORTANT: NEED TO ADD THROTTLING ON THIS API, AS IT IS A PUBLIC API.
 
 import prisma from "../prismaClient";
@@ -9,21 +9,7 @@ import prisma from "../prismaClient";
  * Creates a custom testimonial form
  * @returns id of created testimonial form
  */
-export async function createTestimonialForm(formData: FormData) {
-  console.log("create form: ", formData);
-
-  const questions = formData.getAll("question").map((que) => String(que));
-
-  const data = {
-    title: formData?.get("title")?.toString() ?? "",
-    description: formData.get("thoughts")?.toString() ?? "",
-    enableImageUpload: Boolean(formData.get("enable_image")) ?? false,
-    enableVideoUpload: Boolean(formData.get("enable_video")) ?? false,
-    enableRating: Boolean(formData.get("enable_rating")) ?? false,
-    questions: questions,
-    userId: formData.get("userId")?.toString() ?? "",
-  };
-
+export async function createTestimonialForm(data: Prisma.FormCreateInput) {
   prisma.form
     .create({
       data: data,
@@ -39,22 +25,12 @@ export async function createTestimonialForm(formData: FormData) {
  * Update or create Testimonial form.
  * @param formData Testimonial form's form data.
  */
-export default async function updateForm(formData: FormData) {
-  console.log("update form:", formData);
-
-  const questions = formData.getAll("question").map((que) => String(que));
-
-  const formId = formData.get("id")?.toString() ?? "";
-  const data = {
-    title: formData.get("title")?.toString() ?? "",
-    description: formData.get("thoughts")?.toString() ?? "",
-    enableImageUpload: Boolean(formData.get("enable_image")) ?? false,
-    enableVideoUpload: Boolean(formData.get("enable_video")) ?? false,
-    enableRating: Boolean(formData.get("enable_rating")) ?? false,
-    questions: questions,
-    userId: formData.get("userId")?.toString() ?? "",
-  };
-
+export default async function updateForm(
+  formId: string,
+  data: Prisma.FormUpdateInput,
+  formData: FormData
+) {
+  console.log("upserting", formData);
   // update the form
   prisma.form
     .update({
@@ -86,6 +62,7 @@ export async function getAllFormsForUser(userId?: string): Promise<Form[]> {
     forms = await prisma.form.findMany({
       where: { userId: userId },
       orderBy: { updatedAt: "desc" },
+      include: { questions: true, boards: true, tags: true },
     });
   } catch (error) {
     console.log(error);
@@ -121,6 +98,7 @@ export async function getForm(formId: string) {
       where: {
         id: formId,
       },
+      include: { questions: true, boards: true, tags: true },
     })
     .then((form) => {
       return form;

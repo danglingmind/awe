@@ -14,10 +14,7 @@ export default function TestimonialPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getTestimonialForUser(
-        testimonialId,
-        session.data?.user?.id
-      );
+      const data = await getTestimonialForUser(testimonialId);
       setTestimonial(data);
     };
 

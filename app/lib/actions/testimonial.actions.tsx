@@ -3,13 +3,26 @@ import type { TestimonialCreate } from "@/app/lib/model/testimonial";
 import prisma from "../prismaClient";
 import { Prisma, Testimonial } from "@prisma/client";
 import { isIdValid } from "../utils";
+import { auth } from "../auth";
 
+// TODO: RATE LIMIT THIS API
 /**
  * Creates a testimonial from the submitted form data.
- * @param formData Testimonial formdata
+ * @param testimonial Testimonial formdata
  * @returns testimonial ID
  */
-export async function createTestimonial(formData: FormData) {}
+export async function createTestimonial(testimonial: Testimonial) {
+  return prisma.testimonial
+    .create({
+      data: testimonial,
+    })
+    .then((data) => {
+      return data;
+    })
+    .catch((err) => {
+      throw err;
+    });
+}
 
 function validateFindUniqueTestimonialInput(id: string) {
   return Prisma.validator<Prisma.TestimonialWhereUniqueInput>()({
@@ -27,16 +40,31 @@ export async function testForm(formData: FormData) {
  * @param userId  user ID
  * @returns testimonial
  */
-export async function getTestimonialForUser(
-  testimonialId: string,
-  userId?: string
-) {
+export async function getTestimonialForUser(testimonialId: string) {
+  const session = await auth();
+  if (!session) {
+    throw new Error("User not authenticated");
+  }
+
   try {
     const testimonial = await prisma.testimonial.findUniqueOrThrow({
       where: validateFindUniqueTestimonialInput(testimonialId),
+      include: {
+        owner: true,
+        answers: {
+          select: {
+            id: true,
+            answer: true,
+            question: true,
+          },
+        },
+        tags: true,
+        themes: true,
+        boards: true,
+      },
     });
 
-    if (testimonial.userId !== userId) {
+    if (testimonial.ownerID !== session.user?.id) {
       throw new Error("Testimonial does not belong to user");
     }
 
@@ -61,7 +89,21 @@ export async function getAllTestimonialsForUser(
   let testimonials: Testimonial[] = [];
   try {
     testimonials = await prisma.testimonial.findMany({
-      where: { userId: userId },
+      where: { ownerID: userId },
+      orderBy: { updatedAt: "desc" },
+      include: {
+        owner: true,
+        answers: {
+          select: {
+            id: true,
+            answer: true,
+            question: true,
+          },
+        },
+        tags: true,
+        themes: true,
+        boards: true,
+      },
     });
   } catch (error) {
     console.error(error);
