@@ -1,4 +1,5 @@
 "use client";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 
 export interface INewButtonProps {
@@ -15,9 +16,9 @@ export default function NewButton({
   openNewFormModal,
 }: INewButtonProps) {
   return (
-    <div className="dropdown dropdown-end mt-3">
-      <div tabIndex={0} role="button" className="btn m-1 btn-ghost text-2xl">
-        +
+    <div className="dropdown dropdown-end">
+      <div tabIndex={0} className="btn btn-ghost btn-circle avatar">
+        <Plus />
       </div>
       <ul
         tabIndex={0}

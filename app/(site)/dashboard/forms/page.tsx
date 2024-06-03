@@ -69,11 +69,16 @@ export default function Forms() {
 
   return (
     <>
-      {/* <div className="overflow-x-auto m-3 border border-white">
+      {/* <div className="overflow-x-auto m-3 bg-base-100">
         <table className="table">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
+                <th>
+                  <label>
+                    <input type="checkbox" className="checkbox" />
+                  </label>
+                </th>
                 {headerGroup.headers.map((header) => (
                   <th key={header.id}>
                     {header.isPlaceholder
@@ -90,6 +95,11 @@ export default function Forms() {
           <tbody>
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover">
+                <th>
+                  <label>
+                    <input type="checkbox" className="checkbox" />
+                  </label>
+                </th>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -101,24 +111,29 @@ export default function Forms() {
         </table>
       </div> */}
 
-      <div className="flex flex-row gap-3 flex-wrap m-5">
-        {forms.map((form) => (
-          <div
-            id={form.id}
-            key={form.id}
-            className="card w-96 bg-base-100 shadow-xl"
-          >
-            <div className="card-body">
-              <h2 className="card-title">{form.title}</h2>
-              <p>{form.description}</p>
-              <div className="card-actions justify-end">
+      <div className="flex flex-row gap-3 flex-wrap m-5 p-3 w-11/12">
+        {forms.length > 0 ? (
+          forms.map((form) => (
+            <div
+              id={form.id}
+              key={form.id}
+              className="relative flex justify-between w-full bg-base-200 shadow-xl h-20 my-3 p-3 rounded-lg"
+            >
+              <div className="mx-3 p-2">
+                <div className="font-bold">{form.title}</div>
+                <div className="text-sm opacity-50">{form.description}</div>
+              </div>
+              <div
+                key={"actions-group"}
+                className="flex gap-3 items-center mx-3"
+              >
                 <div className="tooltip" data-tip="copy embed link">
                   <button
                     className="btn btn-circle btn-sm"
                     onClick={() => {
                       const baseUrl = window.location.origin;
                       navigator.clipboard.writeText(
-                        `${baseUrl}/form/${form.id}`
+                        `<body style="margin:0px;padding:0px;overflow:hidden"><iframe src="${baseUrl}/form/${form.id}" frameborder="0" style="overflow:hidden;height:100%;width:100%" height="100%" width="100%"></iframe></body>`
                       );
                     }}
                   >
@@ -151,8 +166,10 @@ export default function Forms() {
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="text-center text-xl opacity-50">No forms found</div>
+        )}
       </div>
       {showModal && (
         <Modal

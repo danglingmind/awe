@@ -5,9 +5,10 @@ import updateForm, {
   createTestimonialForm,
 } from "@/app/lib/actions/form.actions";
 import { useSession } from "next-auth/react";
-import { Board, Form, Prisma, Question } from "@prisma/client";
+import { Board, Form, Prisma, Question, Tag } from "@prisma/client";
 import { getAllUserBoards } from "@/app/lib/actions/board.actions";
 import Select from "react-select";
+import { getTags } from "@/app/lib/actions/tag.actions";
 
 type BoardOption = {
   label: string;
@@ -34,13 +35,23 @@ export function CreateAweForm({
   const formRef = useRef<HTMLFormElement>(null);
   const [refresh, setRefresh] = useState(false);
   const [boards, setBoards] = useState<Board[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    // get all the boards
+    const fetchBoardsData = async () => {
       const data = await getAllUserBoards(session.data?.user?.id);
       setBoards(data);
     };
-    session && fetchData();
+    // get all the tags
+    const fetchTagsData = async () => {
+      const data = await getTags();
+      setTags(data);
+    };
+    if (session) {
+      fetchBoardsData();
+      fetchTagsData();
+    }
   }, [session]);
 
   const refreshPage = () => {
@@ -66,11 +77,10 @@ export function CreateAweForm({
   const prepareCreateFormPayload = (
     formData: FormData
   ): Prisma.FormCreateInput => {
-    console.log("create form: ", formData);
-
     const questionsCreate = formData.getAll("question").map((que) => {
       return {
         question: String(que),
+        active: true,
       };
     });
 
@@ -105,12 +115,12 @@ export function CreateAweForm({
   ): Prisma.FormUpdateInput => {
     // prepare questions
     const questionConnects: { id: string }[] = [];
-    const questionCreates: { question: string }[] = [];
+    const questionCreates: { question: string; active: boolean }[] = [];
 
     questions.map((que) => {
       que.id
         ? questionConnects.push({ id: que.id })
-        : questionCreates.push({ question: que.question });
+        : questionCreates.push({ question: que.question, active: true });
 
       return {
         where: {
@@ -154,6 +164,37 @@ export function CreateAweForm({
       });
     }
 
+    // prepare tags
+    const formTags: string[] = form?.tags.map((tag: Tag) => tag.id) ?? [];
+
+    const newSelectedTags: string[] = [];
+    formData.getAll("tag").forEach((t) => {
+      if (t.toString().trim()) {
+        newSelectedTags.push(t.toString());
+      }
+    });
+
+    const tagConnects: { id: string }[] = [];
+    const tagDisconnects: { id: string }[] = [];
+
+    if (newSelectedTags.length === 0) {
+      formTags.map((tag) => tagDisconnects.push({ id: tag }));
+    } else {
+      // add new tags if not present
+      newSelectedTags.forEach((tag) => {
+        if (!formTags.includes(tag)) {
+          tagConnects.push({ id: tag });
+        }
+      });
+
+      // remove boards if not selected
+      formTags.forEach((tag) => {
+        if (!newSelectedTags.includes(tag)) {
+          tagDisconnects.push({ id: tag });
+        }
+      });
+    }
+
     const data: Prisma.FormUpdateInput = {
       title: formData.get("title")?.toString() ?? "",
       description: formData.get("thoughts")?.toString() ?? "",
@@ -169,6 +210,10 @@ export function CreateAweForm({
       boards: {
         connect: boardConnects ?? [],
         disconnect: boardDisconnects ?? [],
+      },
+      tags: {
+        connect: tagConnects ?? [],
+        disconnect: tagDisconnects ?? [],
       },
     };
     console.log(data);
@@ -309,6 +354,24 @@ export function CreateAweForm({
           />
         </label>
 
+        {/* Tags select */}
+        <label className="form-control w-full max-w-xs">
+          <div className="label">
+            <span className="label-text">{Placeholders.PICK_A_TAG}</span>
+          </div>
+          <Select
+            name="tag"
+            isMulti
+            options={tags.map((tag) => {
+              return { label: tag.name, value: tag.id };
+            })}
+            defaultValue={
+              form?.tags.map((tag: Board) => {
+                return { label: tag.name, value: tag.id };
+              }) ?? []
+            }
+          />
+        </label>
         <div className="flex flex-row gap-2 justify-end mt-4">
           <button
             type="button"

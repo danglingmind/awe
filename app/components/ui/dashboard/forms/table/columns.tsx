@@ -36,4 +36,10 @@ export const FORMS_TABLE_COLUMNS = [
     header: () => <span>Video Image</span>,
     footer: (info) => info.column.id,
   }),
+  columnHelper.accessor((row) => row.tags, {
+    id: "tags",
+    cell: (info) => info.getValue(),
+    header: () => <span>Tags</span>,
+    footer: (info) => info.column.id,
+  }),
 ];

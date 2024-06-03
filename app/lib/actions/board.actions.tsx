@@ -3,8 +3,13 @@
 import { Board } from "@prisma/client";
 import { BoardModel } from "../model/models";
 import prisma from "../prismaClient";
+import { auth } from "../auth";
 
 export async function createBoard(board: BoardModel) {
+  const session = await auth();
+  if (!session) throw new Error("Not authenticated");
+  const userId = await session.user?.id;
+
   const themesConnectOrCreate = board.themes.map((theme) => {
     return {
       where: { id: theme.id },
@@ -21,6 +26,11 @@ export async function createBoard(board: BoardModel) {
       create: {
         id: tag.id,
         name: tag.name,
+        owner: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     };
   });
@@ -78,7 +88,19 @@ export async function getBoard(boardID: string): Promise<Board> {
       include: {
         themes: true,
         tags: true,
-        testimonials: true,
+        testimonials: {
+          select: {
+            id: true,
+            name: true,
+            active: true,
+            answers: {
+              include: {
+                question: true,
+              },
+            },
+            owner: true,
+          },
+        },
       },
     })
     .then((board) => {

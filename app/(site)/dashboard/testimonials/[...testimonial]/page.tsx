@@ -16,6 +16,7 @@ export default function TestimonialPage() {
     const fetchData = async () => {
       const data = await getTestimonialForUser(testimonialId);
       setTestimonial(data);
+      console.log(data);
     };
 
     if (testimonialId && session.data?.user?.id) {

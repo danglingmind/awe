@@ -8,4 +8,6 @@ export enum Placeholders {
   ADD_QUE = "Add your custom question here and click add",
   SHARE_PERMISSION = "Share this form with others",
   PICK_A_BOARD = "Pick boards for testimonial",
+  PICK_A_TAG = "Pick tags for testimonial",
+  PICK_A_COLOR = "Pick a color",
 }

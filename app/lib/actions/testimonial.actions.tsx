@@ -11,7 +11,9 @@ import { auth } from "../auth";
  * @param testimonial Testimonial formdata
  * @returns testimonial ID
  */
-export async function createTestimonial(testimonial: Testimonial) {
+export async function createTestimonial(
+  testimonial: Prisma.TestimonialCreateInput
+) {
   return prisma.testimonial
     .create({
       data: testimonial,
@@ -22,12 +24,6 @@ export async function createTestimonial(testimonial: Testimonial) {
     .catch((err) => {
       throw err;
     });
-}
-
-function validateFindUniqueTestimonialInput(id: string) {
-  return Prisma.validator<Prisma.TestimonialWhereUniqueInput>()({
-    id,
-  });
 }
 
 export async function testForm(formData: FormData) {
@@ -48,7 +44,7 @@ export async function getTestimonialForUser(testimonialId: string) {
 
   try {
     const testimonial = await prisma.testimonial.findUniqueOrThrow({
-      where: validateFindUniqueTestimonialInput(testimonialId),
+      where: { id: testimonialId },
       include: {
         owner: true,
         answers: {
@@ -86,30 +82,37 @@ export async function getAllTestimonialsForUser(
   if (!userId?.trim()) {
     throw new Error("User ID is required");
   }
-  let testimonials: Testimonial[] = [];
-  try {
-    testimonials = await prisma.testimonial.findMany({
+  // return await prisma.testimonial
+  //   .findMany({
+  //     where: {
+  //       ownerID: userId,
+  //     },
+  //   })
+  return await prisma.testimonial
+    .findMany({
       where: { ownerID: userId },
       orderBy: { updatedAt: "desc" },
       include: {
         owner: true,
-        answers: {
-          select: {
-            id: true,
-            answer: true,
-            question: true,
-          },
-        },
+        // answers: {
+        //   select: {
+        //     id: true,
+        //     answer: true,
+        //     // question: true,
+        //   },
+        // },
         tags: true,
         themes: true,
         boards: true,
       },
+    })
+    .then((data) => {
+      return data;
+    })
+    .catch((error) => {
+      console.error(error);
+      throw new Error("Error retrieving testimonials");
     });
-  } catch (error) {
-    console.error(error);
-    throw new Error("Error retrieving testimonials");
-  }
-  return testimonials;
 }
 
 /**

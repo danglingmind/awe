@@ -75,11 +75,7 @@ export default function NavBar() {
             </div>
           </div>
           <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar"
-            >
+            <div tabIndex={0} className="btn btn-ghost btn-circle avatar">
               <Avatar />
             </div>
             <ul

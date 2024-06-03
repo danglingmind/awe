@@ -18,6 +18,10 @@ export interface ModalProps {
    * Enable outside click to cancel the modal.
    */
   outsideClick?: boolean;
+  /**
+   * Background color
+   */
+  bg?: string;
 }
 
 export default function Modal({
@@ -26,6 +30,7 @@ export default function Modal({
   visible,
   setVisible,
   outsideClick,
+  bg,
 }: ModalProps) {
   const enableOutsideClick =
     outsideClick === undefined || outsideClick === true ? true : false;
@@ -43,7 +48,7 @@ export default function Modal({
         className="fixed left-0 top-0 w-full h-full flex flex-col items-center justify-center z-10 backdrop-blur-sm"
       >
         <div className="w-7/12 z-50">
-          <div className="modal-box min-w-full">
+          <div className={`modal-box min-w-full ${bg}`}>
             <div id="header" className="text-lg text-pretty mt-3 mb-3">
               {header}
             </div>

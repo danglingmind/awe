@@ -1,4 +1,4 @@
-import { Answer, Form, Question, Testimonial } from "@prisma/client";
+import { Answer, Form, Prisma, Question, Testimonial } from "@prisma/client";
 import RatingInput from "../common/rating";
 import {
   createTestimonial,
@@ -11,30 +11,37 @@ import test from "node:test";
 import { create } from "domain";
 import { connect } from "http2";
 import { Questrial } from "next/font/google";
+import Modal from "../common/modal";
 
 export default function TestimonialSubmitFormComponent({
   form,
 }: {
   form?: Form;
 }) {
-  const [answers, setAnswers] = useState<Map<String, Answer>>(
-    new Map<String, Answer>()
+  const [answers, setAnswers] = useState<Map<string, Answer>>(
+    new Map<string, Answer>()
   );
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleSubmit = async (formData: FormData) => {
-    await createTestimonial(prepareTestimonialData(formData));
+    if (!submitClicked) {
+      await createTestimonial(prepareTestimonialData(formData));
+      setSubmitSuccess(true);
+      setSubmitClicked(true);
+    }
   };
 
   const prepareTestimonialData = (formData: FormData) => {
     const ansCreateMany: {
       answer: string;
-      questionID: String;
+      questionID: string;
     }[] = [];
-    answers.forEach((ans: Answer, queID: String) => {
+    answers.forEach((ans: Answer, queID: string) => {
       ansCreateMany.push({ answer: ans.answer, questionID: queID });
     });
 
-    const testimonial: Testimonial = {
+    const testimonial: Prisma.TestimonialCreateInput = {
       active: true,
       createdByEmail: formData.get("email")?.toString() ?? "",
       name: formData.get("name")?.toString() ?? "",
@@ -62,94 +69,115 @@ export default function TestimonialSubmitFormComponent({
 
   return (
     form && (
-      <div className="bg-base-100 py-10 mx-auto flex flex-col gap-3 justify-center items-center rounded-md">
-        <div className="avatar">
-          <div className="w-24 rounded-full">
-            {/* TODO: Get the image from the form */}
-            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+      <>
+        <div className="bg-base-100 py-10 mx-auto flex flex-col gap-3 justify-center items-center rounded-md">
+          <div className="avatar">
+            <div className="w-24 rounded-full">
+              {/* TODO: Get the image from the form */}
+              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+            </div>
           </div>
-        </div>
-        <h1 className="font-bold text-2xl">{form?.title}</h1>
-        <h2 className="font-normal text-xl">{form?.description}</h2>
-        {form && (
-          <form
-            action={handleSubmit}
-            className="flex flex-col gap-3 items-center w-full mt-7"
-          >
-            {/* mendetory fields */}
-            <div className="flex flex-row gap-3 justify-center mt-3 mb-3 w-2/3">
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="Email"
-                className="input input-bordered input-sm grow"
-              />
-              <input
-                name="name"
-                type="text"
-                required
-                placeholder="Name"
-                className="input input-bordered input-sm grow"
-              />
-            </div>
-            {form.questions?.map((que: Question) => (
-              <div key={que.id} className="flex flex-col w-2/3 my-1">
-                <div className="label text-sm">{`${que.question} ?`}</div>
-                <textarea
-                  name={que.id}
-                  className="textarea textarea-bordered textarea-sm"
-                  onInput={(e) => {
-                    setAnswers(
-                      answers.set(que.id, {
-                        questionID: que.id,
-                        answer: e.currentTarget.value,
-                      } as Answer)
-                    );
-                  }}
+          <h1 className="font-bold text-2xl">{form?.title}</h1>
+          <h2 className="font-normal text-xl">{form?.description}</h2>
+          {form && (
+            <form
+              action={handleSubmit}
+              className="flex flex-col gap-3 items-center w-full mt-7"
+            >
+              {/* mendetory fields */}
+              <div className="flex flex-row gap-3 justify-center mt-3 mb-3 w-2/3">
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="Email"
+                  className="input input-bordered input-sm grow"
+                />
+                <input
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="Name"
+                  className="input input-bordered input-sm grow"
                 />
               </div>
-            ))}
-
-            {/* show rating */}
-            {form.enableRating && (
-              <div className="my-2 flex flex-row items-center gap-5">
-                {/* <label className="form-control"> */}
-                <div className="label">
-                  <span className="label-text">Rate your experience</span>
+              {form.questions?.map((que: Question) => (
+                <div key={que.id} className="flex flex-col w-2/3 my-1">
+                  <div className="label text-sm">{`${que.question} ?`}</div>
+                  <textarea
+                    required
+                    name={que.id}
+                    className="textarea textarea-bordered textarea-sm"
+                    onInput={(e) => {
+                      setAnswers(
+                        answers.set(que.id, {
+                          questionID: que.id,
+                          answer: e.currentTarget.value,
+                        } as Answer)
+                      );
+                    }}
+                  />
                 </div>
-                <RatingInput />
-                {/* </label> */}
-              </div>
-            )}
-            {/* show image upload */}
-            {form.enableImageUpload && (
-              <div className="my-2">
-                <FileUpload
-                  name="image"
-                  label="Pick an image for testimonial"
-                />
-              </div>
-            )}
-            {/* show video upload */}
-            {form.enableVideoUpload && (
-              <div className="mt-3 mb-3">
-                <FileUpload name="video" label="Pick a video for testimonial" />
-              </div>
-            )}
+              ))}
 
-            <div className="flex gap-2 mt-8 mb-2">
-              <input type="checkbox" name="share-permission" />
-              <label className="label-text">
-                {Placeholders.SHARE_PERMISSION}
+              {/* show rating */}
+              {form.enableRating && (
+                <div className="my-2 flex flex-row items-center gap-5">
+                  {/* <label className="form-control"> */}
+                  <div className="label">
+                    <span className="label-text">Rate your experience</span>
+                  </div>
+                  <RatingInput />
+                  {/* </label> */}
+                </div>
+              )}
+              {/* show image upload */}
+              {form.enableImageUpload && (
+                <div className="my-2">
+                  <FileUpload
+                    name="image"
+                    label="Pick an image for testimonial"
+                  />
+                </div>
+              )}
+              {/* show video upload */}
+              {form.enableVideoUpload && (
+                <div className="mt-3 mb-3">
+                  <FileUpload
+                    name="video"
+                    label="Pick a video for testimonial"
+                  />
+                </div>
+              )}
+
+              <label className="label cursor-pointer flex gap-2 mt-8 mb-2">
+                <input
+                  type="checkbox"
+                  name="share-permission"
+                  className="checkbox"
+                />
+                <span className="label-text">
+                  {Placeholders.SHARE_PERMISSION}
+                </span>
               </label>
+              <button
+                type="submit"
+                className="btn btn-primary w-fit"
+                disabled={submitClicked}
+              >
+                Submit
+              </button>
+            </form>
+          )}
+        </div>
+        {submitSuccess && (
+          <Modal visible={submitSuccess} bg="bg-success">
+            <div className="p-6 items-center justify-center flex text-2xl">
+              <span>Testimonial sent successfully.</span>
             </div>
-            <button type="submit" className="btn btn-primary w-fit">
-              Submit
-            </button>
-          </form>
+          </Modal>
         )}
-      </div>
+      </>
     )
   );
 }
