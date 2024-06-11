@@ -45,6 +45,7 @@ export default function TestimonialSubmitFormComponent({
       active: true,
       createdByEmail: formData.get("email")?.toString() ?? "",
       name: formData.get("name")?.toString() ?? "",
+      feedback: formData.get("feedback")?.toString() ?? "",
       permissionToShare:
         formData.get("permissionToShare")?.toString() === "on" ? true : false,
       verified: true,
@@ -85,22 +86,34 @@ export default function TestimonialSubmitFormComponent({
               className="flex flex-col gap-3 items-center w-full mt-7"
             >
               {/* mendetory fields */}
-              <div className="flex flex-row gap-3 justify-center mt-3 mb-3 w-2/3">
-                <input
-                  name="email"
-                  type="email"
+              <div
+                key={"mendetory-fields"}
+                className="flex flex-col gap-3 justify-center mt-3 mb-3 w-2/3"
+              >
+                <div className="flex flex-row gap-3 justify-center mt-3 mb-3">
+                  <input
+                    name="name"
+                    type="text"
+                    required
+                    placeholder="Name"
+                    className="input input-bordered input-sm grow"
+                  />
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="Email"
+                    className="input input-bordered input-sm grow"
+                  />
+                </div>
+                <textarea
                   required
-                  placeholder="Email"
-                  className="input input-bordered input-sm grow"
-                />
-                <input
-                  name="name"
-                  type="text"
-                  required
-                  placeholder="Name"
-                  className="input input-bordered input-sm grow"
+                  name="feedback"
+                  placeholder="Please give a feedback !!"
+                  className="textarea textarea-bordered textarea-sm"
                 />
               </div>
+
               {form.questions?.map((que: Question) => (
                 <div key={que.id} className="flex flex-col w-2/3 my-1">
                   <div className="label text-sm">{`${que.question} ?`}</div>

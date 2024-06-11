@@ -48,46 +48,54 @@ export default function SideNav({ children }: { children: ReactNode }) {
           >
             {/* Sidebar content here */}
             <li>
-              <div className="tooltip" data-tip="home">
-                <Link href={"/dashboard"}>
-                  <Home className="h-5 w-5" />
-                </Link>
-              </div>
+              <Link href={"/dashboard"} className="tooltip" data-tip="home">
+                <Home className="h-5 w-5" />
+              </Link>
             </li>
             <li>
-              <div className="tooltip" data-tip="boards">
-                <Link href={"/dashboard/boards"}>
-                  <GalleryHorizontalEndIcon className="h-5 w-5" />
-                </Link>
-              </div>
+              <Link
+                href={"/dashboard/boards"}
+                className="tooltip"
+                data-tip="boards"
+              >
+                <GalleryHorizontalEndIcon className="h-5 w-5" />
+              </Link>
             </li>
             <li>
-              <div className="tooltip" data-tip="testimonials">
-                <Link href={"/dashboard/testimonials"}>
-                  <MessageSquareMore className="h-5 w-5" />
-                </Link>
-              </div>
+              <Link
+                href={"/dashboard/testimonials"}
+                className="tooltip"
+                data-tip="testimonials"
+              >
+                <MessageSquareMore className="h-5 w-5" />
+              </Link>
             </li>
             <li>
-              <div className="tooltip" data-tip="tags">
-                <Link href={"/dashboard/tags"}>
-                  <Tag className="h-5 w-5" />
-                </Link>
-              </div>
+              <Link
+                href={"/dashboard/tags"}
+                className="tooltip"
+                data-tip="tags"
+              >
+                <Tag className="h-5 w-5" />
+              </Link>
             </li>
             <li>
-              <div className="tooltip" data-tip="forms">
-                <Link href={"/dashboard/forms"}>
-                  <FilePen className="h-5 w-5" />
-                </Link>
-              </div>
+              <Link
+                href={"/dashboard/forms"}
+                className="tooltip"
+                data-tip="forms"
+              >
+                <FilePen className="h-5 w-5" />
+              </Link>
             </li>
-            <li className="mt-40">
-              <div className="tooltip" data-tip="logout">
-                <Link href={"/api/auth/signout"}>
-                  <LogOut className="h-5 w-5" />
-                </Link>
-              </div>
+            <li className="mt-52">
+              <Link
+                href={"/api/auth/signout"}
+                className="tooltip"
+                data-tip="logout"
+              >
+                <LogOut className="h-5 w-5" />
+              </Link>
             </li>
           </ul>
         </div>

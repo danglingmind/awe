@@ -5,7 +5,7 @@ export function Avatar() {
   const session = useSession();
 
   return session?.data?.user?.image ? (
-    <div className="w-10 rounded-full">
+    <div className="w-14 rounded-full">
       <Image
         alt="Profile picture avatar of user"
         src={session?.data?.user?.image}

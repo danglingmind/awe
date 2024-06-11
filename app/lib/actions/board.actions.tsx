@@ -54,7 +54,30 @@ export async function createBoard(board: BoardModel) {
   return true;
 }
 
-export async function updateBoard(board: BoardModel) {}
+export async function updateBoard(board: BoardModel) {
+  const session = await auth();
+  if (!session) throw new Error("Not authenticated");
+
+  // process themes and remove the deleted themes from the board
+  board.themes.forEach((theme) => {});
+
+  return prisma.board
+    .update({
+      where: {
+        id: board.id,
+        userId: session.user?.id,
+      },
+      data: {
+        active: board.active,
+        name: board.name,
+        description: board.description,
+      },
+    })
+    .then(() => console.log("board Updated"))
+    .catch((err) => {
+      throw err;
+    });
+}
 
 export async function getAllUserBoards(userId?: string): Promise<Board[]> {
   if (!userId?.trim()) {
@@ -110,6 +133,50 @@ export async function getBoard(boardID: string): Promise<Board> {
         throw new Error("Board not found");
       }
     })
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export async function deleteBoard(boardID: string) {
+  const session = await auth();
+  if (!session) throw new Error("Not authenticated");
+
+  return prisma.board
+    .delete({
+      where: {
+        id: boardID,
+        userId: session.user?.id,
+      },
+    })
+    .then(() => console.log("board deleted"))
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export async function removeTestimonialFromBoard(
+  boardID: string,
+  testimonialID: string
+) {
+  const session = await auth();
+  if (!session) throw new Error("Not authenticated");
+
+  return prisma.board
+    .update({
+      where: {
+        id: boardID,
+        userId: session.user?.id,
+      },
+      data: {
+        testimonials: {
+          disconnect: {
+            id: testimonialID,
+          },
+        },
+      },
+    })
+    .then(() => console.log("testimonial removed"))
     .catch((err) => {
       throw err;
     });

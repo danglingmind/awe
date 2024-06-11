@@ -47,6 +47,7 @@ export function CreateBoardForm({
     const board: BoardModel = {} as BoardModel;
 
     board.name = formData.get("name")?.toString() ?? "";
+    board.description = formData.get("description")?.toString() ?? "";
     board.active = true;
     board.userId = userId;
     // get the theme
@@ -81,6 +82,13 @@ export function CreateBoardForm({
         className="input input-bordered"
         required
       />
+      <textarea
+        name="description"
+        placeholder={Placeholders.ENTER_YOUR_THOUGHTS}
+        defaultValue={board?.description ?? ""}
+        className="textarea textarea-bordered"
+      />
+
       {/* Theme selection */}
       <label className="form-control w-full max-w-xs">
         <div className="label">

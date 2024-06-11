@@ -1,9 +1,6 @@
 "use client";
 import { getAllTestimonialsForUser } from "@/app/lib/actions/testimonial.actions";
-import TestimonialCard, {
-  ITestimonialCard,
-} from "@/app/components/ui/cards/testimonial";
-import NewButton from "@/app/components/ui/dashboard/new-button";
+import TestimonialCard from "@/app/components/ui/cards/testimonial";
 import { Testimonial } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -28,15 +25,9 @@ export default function Testimonials() {
   return (
     <div className="relative">
       <Suspense fallback={<h1>Loading...</h1>}>
-        <div className="flex gap-3 m-5">
+        <div className="flex gap-3 m-5 flex-wrap">
           {testimonials?.map((testimonial) => {
-            const link =
-              "/dashboard/testimonials/testimonial?id=" + testimonial.id;
-            return (
-              <Link key={testimonial.id + "_" + testimonial.name} href={link}>
-                <div className="bg-base-100">{testimonial.name}</div>
-              </Link>
-            );
+            return <TestimonialCard key={testimonial.id} {...testimonial} />;
           })}
         </div>
       </Suspense>

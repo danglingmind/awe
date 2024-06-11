@@ -82,25 +82,20 @@ export async function getAllTestimonialsForUser(
   if (!userId?.trim()) {
     throw new Error("User ID is required");
   }
-  // return await prisma.testimonial
-  //   .findMany({
-  //     where: {
-  //       ownerID: userId,
-  //     },
-  //   })
+
   return await prisma.testimonial
     .findMany({
       where: { ownerID: userId },
       orderBy: { updatedAt: "desc" },
       include: {
         owner: true,
-        // answers: {
-        //   select: {
-        //     id: true,
-        //     answer: true,
-        //     // question: true,
-        //   },
-        // },
+        answers: {
+          select: {
+            id: true,
+            answer: true,
+            question: true,
+          },
+        },
         tags: true,
         themes: true,
         boards: true,

@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export default function SideMenu() {
   return (
-    <div className="flex flex-col gap-4 items-center m-6 py-5 rounded-box bg-base-200">
+    <div className="flex flex-col gap-4 items-center m-6 py-5 rounded-box bg-base-300">
       {/* Menu item */}
       <div className="flex flex-col gap-6 justify-between">
         <Link href={"/dashboard"} className="btn btn-ghost">
@@ -31,7 +31,7 @@ export default function SideMenu() {
         </Link>
       </div>
       {/* gap */}
-      <div style={{ height: "20vh" }}></div>
+      <div style={{ height: "30vh" }}></div>
       {/* Lower items */}
       <div className="btn btn-ghost">
         <LogOutIcon className="w-5 h-5" />
