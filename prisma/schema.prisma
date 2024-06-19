@@ -138,6 +138,7 @@ model Board {
 model Testimonial {
   id                String          @id @default(auto()) @map("_id") @db.ObjectId
   name              String?
+  feedback          String
   active            Boolean
   permissionToShare Boolean?
   imageUploaded     Boolean?

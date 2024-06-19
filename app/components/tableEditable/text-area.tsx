@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const TextInputCell = ({ getValue, row, column, table }) => {
+const TextAreaCell = ({ getValue, row, column, table }) => {
   const initialValue = getValue();
   const [value, setValue] = useState(initialValue);
 
@@ -15,12 +15,12 @@ const TextInputCell = ({ getValue, row, column, table }) => {
   }, [initialValue]);
 
   return (
-    <input
-      className="input input-ghost w-full max-w-xs"
+    <textarea
+      className="textarea textarea-ghost"
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onBlur={onBlur}
     />
   );
 };
-export default TextInputCell;
+export default TextAreaCell;

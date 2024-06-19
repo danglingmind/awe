@@ -17,6 +17,15 @@ import { useEffect, useState } from "react";
 import TextInputCell from "@/app/components/tableEditable/text-input";
 import CheckboxCell from "@/app/components/tableEditable/checkbox";
 import SelectCell from "@/app/components/tableEditable/select";
+import {
+  CheckCheckIcon,
+  CheckIcon,
+  CrossIcon,
+  Edit2Icon,
+  Edit3,
+  Save,
+} from "lucide-react";
+import TextAreaCell from "@/app/components/tableEditable/text-area";
 
 export type ITableBoardItem = {
   id: string;
@@ -46,38 +55,10 @@ declare module "@tanstack/react-table" {
 
 const columnHelper = createColumnHelper<Board>();
 
-const columns = [
-  columnHelper.accessor((row) => `${row.name}`, {
-    id: "name",
-    header: "Name",
-    cell: TextInputCell,
-    // cell: (info) => <div>{info.getValue()}</div>,
-  }),
-  columnHelper.accessor((row) => `${row.description}`, {
-    id: "description",
-    header: "Description",
-    cell: (info) => <div>{info.getValue()}</div>,
-  }),
-  columnHelper.accessor((row) => `${row.active}`, {
-    id: "active",
-    header: "Active",
-    cell: CheckboxCell,
-  }),
-  columnHelper.accessor((row) => `${row.themeIDs}`, {
-    id: "themeIDs",
-    header: "Themes",
-    cell: SelectCell,
-  }),
-  columnHelper.accessor((row) => `${row.createdAt}`, {
-    id: "createdAt",
-    header: "Created At",
-    cell: (info) => <div>{new Date(info.getValue()).toLocaleString()}</div>,
-  }),
-];
-
 export default function Boards() {
   const session = useSession();
   const [boards, setBoards] = useState<Board[]>([]);
+  const [modifiedIndex, setModifiedIndex] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,6 +77,62 @@ export default function Boards() {
     console.log(boards);
   }, [boards]);
 
+  const columns = [
+    columnHelper.accessor((row) => `${row.name}`, {
+      id: "name",
+      header: "Name",
+      cell: TextInputCell,
+    }),
+    columnHelper.accessor((row) => `${row.description}`, {
+      id: "description",
+      header: "Description",
+      cell: TextAreaCell,
+      // cell: (info) => <div>{info.getValue()}</div>,
+    }),
+    columnHelper.accessor((row) => `${row.active}`, {
+      id: "active",
+      header: "Active",
+      cell: CheckboxCell,
+    }),
+    columnHelper.accessor((row) => `${row.themeIDs}`, {
+      id: "themeIDs",
+      header: "Themes",
+      cell: SelectCell,
+    }),
+    columnHelper.accessor((row) => `${row.createdAt}`, {
+      id: "createdAt",
+      header: "Created At",
+      cell: (info) => <div>{new Date(info.getValue()).toLocaleString()}</div>,
+    }),
+    columnHelper.display({
+      id: "edit",
+      cell: (props) => {
+        const btnClass =
+          "btn rounded-full tooltip" +
+          " " +
+          `${
+            modifiedIndex?.includes(props.row.index)
+              ? "btn-primary"
+              : "btn-ghost"
+          }`;
+        return (
+          <button
+            className={btnClass}
+            data-tip="save"
+            disabled={!modifiedIndex?.includes(props.row.index)}
+            onClick={() => {
+              setModifiedIndex(
+                modifiedIndex?.filter((i) => props.row.index !== i)
+              );
+            }}
+          >
+            <Save className="w-4 h-4" />
+          </button>
+        );
+      },
+    }),
+  ];
+
   const table = useReactTable({
     data: boards,
     columns,
@@ -105,17 +142,30 @@ export default function Boards() {
         setBoards((prev) =>
           prev.map((row, index) => {
             if (index == rowIndex) {
+              let modifiedRow = {} as Board;
+
               if (columnId === "themeIDs") {
-                return {
+                modifiedRow = {
                   ...prev[rowIndex],
                   [columnId]: [value] as string[],
                 };
+              } else {
+                modifiedRow = {
+                  ...prev[rowIndex],
+                  [columnId]: value,
+                };
               }
 
-              return {
-                ...prev[rowIndex],
-                [columnId]: value,
-              };
+              if (
+                !Array.isArray(prev[rowIndex][columnId]) &&
+                modifiedRow[columnId] !== prev[rowIndex][columnId]
+              ) {
+                setModifiedIndex([...modifiedIndex, rowIndex]);
+              } else if (Array.isArray(prev[rowIndex][columnId])) {
+                setModifiedIndex([...modifiedIndex, Number(rowIndex)]);
+              }
+
+              return modifiedRow;
             } else {
               return row;
             }

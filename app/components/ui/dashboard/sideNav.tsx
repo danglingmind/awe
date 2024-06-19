@@ -40,7 +40,10 @@ export default function SideNav({ children }: { children: ReactNode }) {
         {/* <SideMenu /> */}
         <div
           className="flex flex-col gap-3 justify-between"
-          style={{ height: "95vh" }}
+          style={{
+            height: "95vh",
+            scrollbarWidth: "none",
+          }}
         >
           <ul
             className="menu rounded-box mx-4 my-6 bg-base-200 flex flex-col gap-4"
