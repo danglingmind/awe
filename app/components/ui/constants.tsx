@@ -10,4 +10,11 @@ export enum Placeholders {
   PICK_A_BOARD = "Pick boards for testimonial",
   PICK_A_TAG = "Pick tags for testimonial",
   PICK_A_COLOR = "Pick a color",
+  PICK_H_FONT = "Pick heading font",
+  PICK_P_FONT = "Pick text font",
+  PICK_A_THEME = "Pick a theme",
+  PICK_H_FONT_SIZE = "Pick heading font size",
+  PICK_P_FONT_SIZE = "Pick text font size",
+  BORDER_RADIUS = "Select border radius.",
+  BG_COLOR = "Select background color.",
 }

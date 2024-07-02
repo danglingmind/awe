@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const CheckboxCell = ({ getValue, row, column, table }) => {
   const initialValue = getValue();
 
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(Boolean(JSON.parse(initialValue)));
 
   // onChange, we'll call our table meta's updateData function
   const onChange = (value: boolean) => {
@@ -18,6 +18,7 @@ const CheckboxCell = ({ getValue, row, column, table }) => {
   return (
     <input
       type="checkbox"
+      className="checkbox checkbox-sm"
       defaultChecked={Boolean(value)}
       onChange={(e) => {
         onChange(e.target.checked);

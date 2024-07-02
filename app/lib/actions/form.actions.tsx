@@ -9,7 +9,7 @@ import prisma from "../prismaClient";
  * Creates a custom testimonial form
  * @returns id of created testimonial form
  */
-export async function createTestimonialForm(data: Prisma.FormCreateInput) {
+export async function createTestimonialForm(data: Form) {
   prisma.form
     .create({
       data: data,
@@ -27,10 +27,8 @@ export async function createTestimonialForm(data: Prisma.FormCreateInput) {
  */
 export default async function updateForm(
   formId: string,
-  data: Prisma.FormUpdateInput,
-  formData: FormData
+  data: Prisma.FormUpdateInput
 ) {
-  console.log("upserting", formData);
   // update the form
   prisma.form
     .update({

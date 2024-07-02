@@ -27,6 +27,7 @@ export interface BoardModel {
   description: string;
   active: boolean;
   themes: ThemeModel[];
+  themeIDs: string[];
   tags: TagModel[];
   userId: string;
   embedLink?: string;

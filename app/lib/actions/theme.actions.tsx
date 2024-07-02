@@ -12,3 +12,16 @@ export async function getAllThemes(): Promise<Theme[]> {
       throw err;
     });
 }
+
+export async function createTheme(theme: Theme): Promise<Theme> {
+  return prisma.theme
+    .create({
+      data: theme,
+    })
+    .then((theme) => {
+      return theme;
+    })
+    .catch((err) => {
+      throw err;
+    });
+}

@@ -27,7 +27,7 @@ const SelectCell = ({ getValue, row, column, table }) => {
   return (
     <select
       name="theme"
-      className="select select-bordered select-sm"
+      className="select select-bordered select-xs"
       value={value}
       onChange={(e) => {
         setValue(e.target.value);

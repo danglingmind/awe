@@ -10,29 +10,12 @@ export async function createBoard(board: BoardModel) {
   if (!session) throw new Error("Not authenticated");
   const userId = await session.user?.id;
 
-  const themesConnectOrCreate = board.themes.map((theme) => {
-    return {
-      where: { id: theme.id },
-      create: {
-        id: theme.id,
-        name: theme.name,
-      },
-    };
+  const themesConnect = board.themes.map((theme) => {
+    return { id: theme.id };
   });
 
-  const tagsConnectOrCreate = board.tags?.map((tag) => {
-    return {
-      where: { id: tag.id },
-      create: {
-        id: tag.id,
-        name: tag.name,
-        owner: {
-          connect: {
-            id: userId,
-          },
-        },
-      },
-    };
+  const tagsConnect = board.tags?.map((tag) => {
+    return { id: tag.id };
   });
 
   prisma.board
@@ -43,8 +26,12 @@ export async function createBoard(board: BoardModel) {
         userId: board.userId,
         description: board.description,
         embedLink: board?.embedLink ?? "",
-        themes: { connectOrCreate: themesConnectOrCreate },
-        tags: { connectOrCreate: tagsConnectOrCreate },
+        themes: {
+          connect: themesConnect,
+        },
+        tags: {
+          connect: tagsConnect,
+        },
       },
     })
     .then(() => console.log("board Created"))
@@ -55,11 +42,9 @@ export async function createBoard(board: BoardModel) {
 }
 
 export async function updateBoard(board: BoardModel) {
+  console.log("updating board: ", board);
   const session = await auth();
   if (!session) throw new Error("Not authenticated");
-
-  // process themes and remove the deleted themes from the board
-  board.themes.forEach((theme) => {});
 
   return prisma.board
     .update({
@@ -71,6 +56,7 @@ export async function updateBoard(board: BoardModel) {
         active: board.active,
         name: board.name,
         description: board.description,
+        themeIDs: board.themeIDs,
       },
     })
     .then(() => console.log("board Updated"))
@@ -79,10 +65,12 @@ export async function updateBoard(board: BoardModel) {
     });
 }
 
-export async function getAllUserBoards(userId?: string): Promise<Board[]> {
-  if (!userId?.trim()) {
-    throw new Error("Invalid user ID");
-  }
+export async function getAllUserBoards(
+  id: string | undefined
+): Promise<Board[]> {
+  const session = await auth();
+  if (!session) throw new Error("Not authenticated");
+  const userId = await session.user?.id;
 
   return prisma.board
     .findMany({

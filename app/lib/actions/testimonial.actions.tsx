@@ -26,10 +26,6 @@ export async function createTestimonial(
     });
 }
 
-export async function testForm(formData: FormData) {
-  console.log(formData);
-}
-
 /**
  * Get given testimonial for user
  * @param testimonialId testimonial ID
@@ -131,3 +127,65 @@ export async function deleteTestimonial(id: string) {
 
 // upsert testimonial
 export async function updateOrCreateTestimonial() {}
+
+export async function getFilteredTestimonial(filters: {
+  [key: string]: string[];
+}) {
+  const session = await auth();
+  if (!session) {
+    throw new Error("User not authenticated");
+  }
+
+  console.log("incoming filters", filters);
+  const tagIds = filters["tags"];
+  const boardIds = filters["boards"];
+  const themeIds = filters["themes"];
+
+  let whereClause = {};
+
+  whereClause = { ownerID: session.user?.id };
+
+  if (tagIds?.length) {
+    whereClause = {
+      ...whereClause,
+      tagIDs: {
+        hasEvery: tagIds,
+      },
+    };
+  }
+  if (boardIds?.length) {
+    whereClause = {
+      ...whereClause,
+      boardIDs: {
+        hasEvery: boardIds,
+      },
+    };
+  }
+  if (themeIds?.length) {
+    whereClause = {
+      ...whereClause,
+      themeIDs: {
+        hasEvery: themeIds,
+      },
+    };
+  }
+
+  console.log(whereClause);
+
+  return prisma.testimonial.findMany({
+    where: whereClause,
+    include: {
+      owner: true,
+      answers: {
+        select: {
+          id: true,
+          answer: true,
+          question: true,
+        },
+      },
+      tags: true,
+      themes: true,
+      boards: true,
+    },
+  });
+}

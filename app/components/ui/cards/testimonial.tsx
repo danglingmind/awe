@@ -1,72 +1,81 @@
-import { Answer, Board, Tag, Testimonial } from "@prisma/client";
-import { Link2 } from "lucide-react";
+"use client";
+import { Testimonial } from "@prisma/client";
+import { Code } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { cardStyles } from "../styles";
+import { useSession } from "next-auth/react";
 
-export default function TestimonialCard(t: Testimonial) {
-  const link = "/dashboard/testimonials/testimonial?id=" + t.id;
+export default function TestimonialCard({
+  testimonial,
+  cardSize,
+}: {
+  testimonial: Testimonial;
+  cardSize: string;
+}) {
+  const link = "/dashboard/testimonials/testimonial?id=" + testimonial.id;
+  const session = useSession();
   return (
-    <div className="card bg-neutral text-neutral-content shadow-xl max-w-xl max-h-xl">
-      <div className="card-body">
-        <Link key={t.id} href={link}>
-          <div key={"person-info"} className="flex flex-row gap-4">
+    <div
+      className="shadow-xl"
+      style={{
+        ...cardStyles[cardSize],
+        ...cardStyles.card,
+      }}
+    >
+      <div className="">
+        <Link key={testimonial.id} href={link}>
+          <div
+            key={"person-info"}
+            className="flex flex-row gap-2 max-w-11/12 m-1"
+          >
             <Image
               alt="testimonial-owner-image"
-              src={"https://source.unsplash.com/random/56×56/?closeup,face"}
+              src={session?.data?.user?.image ?? ""}
               width={40}
               height={40}
-              className="rounded-full w-14"
+              className="rounded-full w-10 h-10"
             />
-            <div className="flex flex-col gap-2">
-              <div key={"person-name"}>{t.name}</div>
-              <div key={"person-email"}>{t.createdByEmail}</div>
+            <div className="flex flex-col text-sm text-wrap overflow-clip">
+              <div
+                key={"person-name"}
+                className="font-semibold text-xs capitalize text-wrap max-w-full"
+              >
+                {testimonial.name}
+              </div>
+              <div
+                key={"person-email"}
+                className="font-light text-xs break-all"
+              >
+                {testimonial.createdByEmail}
+              </div>
             </div>
           </div>
           <div
             key={"feedback"}
-            className="border border-neutral-500 p-3 mt-2 rounded-lg text-sm"
+            className="p-3 mx-1 my-2 text-xs max-h-72 min-h-10 text-wrap overflow-hidden text-ellipsis"
           >
-            {t?.feedback}
+            {testimonial?.feedback}
           </div>
         </Link>
-        <div key={"que-count"} className="flex justify-between my-3">
-          <div key={"tags"} className="flex flex-row gap-2 items-center">
-            <div className="opacity-50 text-sm">tags: </div>
-            {t.tags.map((tag: Tag) => (
-              <div
-                key={tag.id}
-                className="badge badge-sm p-3"
-                // style={{ background: tag.color }}
-              >
-                {tag.name}
+        <div className="flex flex-row items-center justify-between my-3 text-xs">
+          <span className=""> {`+ ${testimonial.answers.length} answers`}</span>
+          <span>
+            {testimonial.rating && (
+              <div className="flex gap-1 items-baseline">
+                <div>{testimonial.rating}</div>
+                <div className="rating rating-xs">
+                  <input type="radio" className="mask mask-star-2 mask-sm" />
+                </div>
               </div>
-            ))}
-          </div>
-          {`+ ${t.answers.length} answers`}
-        </div>
-
-        <div className="flex justify-between">
-          {t.boards.length > 0 && (
-            <div key={"boards"} className="flex flex-row gap-2 items-center">
-              <div className="opacity-50 text-sm">boards: </div>
-              {t.boards.map((board: Board) => {
-                const link = "/dashboard/boards/board?id=" + board.id;
-                return (
-                  <Link key={board.id} href={link}>
-                    <div key={board.id} className="badge badge-sm p-3">
-                      {board.name}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-          <button
-            className="btn btn-ghost rounded-full tooltip tooltip-right"
+            )}
+          </span>
+          <div
+            className="rounded-full tooltip tooltip-right z-10"
             data-tip="copy embed code"
           >
-            <Link2 className="w-5 h-5" />
-          </button>
+            <Code className="w-3 h-3 rounded-full" data-tip="copy embed code" />
+          </div>
         </div>
       </div>
     </div>

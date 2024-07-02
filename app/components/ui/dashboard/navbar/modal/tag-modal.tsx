@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import Modal from "../../../common/modal";
-import { CreateTagForm } from "../../tags/tag";
+import { CreateTagForm } from "../../tags/create-tag-form";
 
 export interface TagModalProps {
   visible: boolean;

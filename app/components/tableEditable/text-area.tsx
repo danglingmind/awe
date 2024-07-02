@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 
 const TextAreaCell = ({ getValue, row, column, table }) => {
   const initialValue = getValue();
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(
+    initialValue === "null" ||
+      initialValue === null ||
+      initialValue.trim() === ""
+      ? ""
+      : initialValue
+  );
 
   // When the input is blurred, we'll call our table meta's updateData function
   const onBlur = () => {
@@ -16,7 +22,7 @@ const TextAreaCell = ({ getValue, row, column, table }) => {
 
   return (
     <textarea
-      className="textarea textarea-ghost"
+      className="textarea textarea-ghost textarea-xs w-11/12"
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onBlur={onBlur}

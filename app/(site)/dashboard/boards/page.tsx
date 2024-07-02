@@ -2,7 +2,11 @@
 "use client";
 import EditableCell from "@/app/components/tableEditable/text-input";
 import EditableCheckbox from "@/app/components/tableEditable/checkbox";
-import { getAllUserBoards } from "@/app/lib/actions/board.actions";
+import {
+  deleteBoard,
+  getAllUserBoards,
+  updateBoard,
+} from "@/app/lib/actions/board.actions";
 import { Board, Form, Tag, Testimonial, Theme, User } from "@prisma/client";
 import {
   ColumnDef,
@@ -21,11 +25,15 @@ import {
   CheckCheckIcon,
   CheckIcon,
   CrossIcon,
+  Delete,
+  DeleteIcon,
   Edit2Icon,
   Edit3,
   Save,
+  Trash2,
 } from "lucide-react";
 import TextAreaCell from "@/app/components/tableEditable/text-area";
+import { BoardModel } from "@/app/lib/model/models";
 
 export type ITableBoardItem = {
   id: string;
@@ -47,6 +55,11 @@ export type ITableBoardItem = {
   forms: Form[];
 };
 
+type DeleteConfirmationType = {
+  id: string;
+  name: string;
+};
+
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     updateData: (rowIndex: number, columnId: string, value: unknown) => void;
@@ -59,6 +72,8 @@ export default function Boards() {
   const session = useSession();
   const [boards, setBoards] = useState<Board[]>([]);
   const [modifiedIndex, setModifiedIndex] = useState<number[]>([]);
+  const [deleteConfirmation, setDeleteConfirmation] =
+    useState<DeleteConfirmationType>({} as DeleteConfirmationType);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,7 +92,29 @@ export default function Boards() {
     console.log(boards);
   }, [boards]);
 
+  function onSave(index: number) {
+    const updatedBoard = boards.at(index);
+    const payload: BoardModel = {
+      id: updatedBoard?.id,
+      name: updatedBoard?.name,
+      description: updatedBoard?.description,
+      active: updatedBoard?.active,
+      themeIDs: updatedBoard?.themeIDs,
+    } as BoardModel;
+
+    const updateBoardApiCall = async () => {
+      const resp = await updateBoard(payload);
+    };
+
+    updateBoardApiCall();
+  }
+
   const columns = [
+    columnHelper.accessor((row) => `${row.active}`, {
+      id: "active",
+      header: "Active",
+      cell: CheckboxCell,
+    }),
     columnHelper.accessor((row) => `${row.name}`, {
       id: "name",
       header: "Name",
@@ -89,11 +126,6 @@ export default function Boards() {
       cell: TextAreaCell,
       // cell: (info) => <div>{info.getValue()}</div>,
     }),
-    columnHelper.accessor((row) => `${row.active}`, {
-      id: "active",
-      header: "Active",
-      cell: CheckboxCell,
-    }),
     columnHelper.accessor((row) => `${row.themeIDs}`, {
       id: "themeIDs",
       header: "Themes",
@@ -102,7 +134,11 @@ export default function Boards() {
     columnHelper.accessor((row) => `${row.createdAt}`, {
       id: "createdAt",
       header: "Created At",
-      cell: (info) => <div>{new Date(info.getValue()).toLocaleString()}</div>,
+      cell: (info) => (
+        <div className="text-xs opacity-50">
+          {new Date(info.getValue()).toLocaleString()}
+        </div>
+      ),
     }),
     columnHelper.display({
       id: "edit",
@@ -121,12 +157,32 @@ export default function Boards() {
             data-tip="save"
             disabled={!modifiedIndex?.includes(props.row.index)}
             onClick={() => {
+              onSave(props.row.index);
               setModifiedIndex(
                 modifiedIndex?.filter((i) => props.row.index !== i)
               );
             }}
           >
             <Save className="w-4 h-4" />
+          </button>
+        );
+      },
+    }),
+    columnHelper.display({
+      id: "delete",
+      cell: (props) => {
+        return (
+          <button
+            className="btn btn-ghost rounded-full"
+            onClick={() => {
+              setDeleteConfirmation({
+                name: props.row.original.name,
+                id: props.row.original.id,
+              });
+              document?.getElementById("delete_conf")?.showModal();
+            }}
+          >
+            <Trash2 className="w-4 h-4 text-red-600" />
           </button>
         );
       },
@@ -177,15 +233,49 @@ export default function Boards() {
 
   return (
     <>
+      {/* Deletion confirmation */}
+      {/* {deleteConfirmation && ( */}
+      <dialog id="delete_conf" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">
+            <span className="text-red-600">Delete</span> "
+            {deleteConfirmation?.name}" ?
+          </h3>
+          <p className="py-4">Do you want to delete the board ?</p>
+          <div className="modal-action">
+            <form method="dialog" className="flex gap-3">
+              <button
+                className="btn btn-sm"
+                onClick={() =>
+                  setDeleteConfirmation({} as DeleteConfirmationType)
+                }
+              >
+                No
+              </button>
+              <button
+                className="btn btn-sm btn-error"
+                onClick={() => {
+                  const callDelete = async () => {
+                    await deleteBoard(deleteConfirmation?.id);
+                  };
+                  callDelete();
+                }}
+              >
+                Yes
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
       <div className="text-4xl ml-5">Boards</div>
       <div className="flex flex-row gap-3 flex-wrap m-5">
-        <div key={"table"}>
-          <table className="table table-zebra">
+        <div key={"table"} className="w-full">
+          <table className="table table-xs">
             <thead className="">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="table-row">
                   {headerGroup.headers.map((header) => (
-                    <th key={header.id} className="table-cell">
+                    <th key={header.id} className="table-cell border uppercase">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -199,7 +289,7 @@ export default function Boards() {
             </thead>
             <tbody>
               {table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="table-row">
+                <tr key={row.id} className="table-row hover">
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="table-cell">
                       {flexRender(

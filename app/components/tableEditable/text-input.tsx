@@ -16,7 +16,7 @@ const TextInputCell = ({ getValue, row, column, table }) => {
 
   return (
     <input
-      className="input input-ghost w-full max-w-xs"
+      className="input input-ghost input-sm w-11/12 capitalize"
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onBlur={onBlur}

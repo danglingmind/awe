@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef, useState } from "react";
 import { Placeholders } from "../../constants";
 import { SubmitButton } from "../../common/submit-button";
@@ -74,9 +75,7 @@ export function CreateAweForm({
     setQuestions(newList);
   };
 
-  const prepareCreateFormPayload = (
-    formData: FormData
-  ): Prisma.FormCreateInput => {
+  const prepareCreateFormPayload = (formData: FormData): Form => {
     const questionsCreate = formData.getAll("question").map((que) => {
       return {
         question: String(que),
@@ -92,7 +91,15 @@ export function CreateAweForm({
       }
     });
 
-    const data: Prisma.FormCreateInput = {
+    // prepare tags
+    const newSelectedTags: { id: string }[] = [];
+    formData.getAll("tag").forEach((t) => {
+      if (t.toString().trim()) {
+        newSelectedTags.push({ id: t.toString() });
+      }
+    });
+
+    const data: Form = {
       title: formData?.get("title")?.toString() ?? "",
       description: formData.get("thoughts")?.toString() ?? "",
       enableImageUpload: Boolean(formData.get("enable_image")) ?? false,
@@ -105,14 +112,13 @@ export function CreateAweForm({
         },
       },
       boards: { connect: newSelectedBoards },
+      tags: { connect: newSelectedTags },
     };
 
     return data;
   };
 
-  const prepareUpdateFormPayload = (
-    formData: FormData
-  ): Prisma.FormUpdateInput => {
+  const prepareUpdateFormPayload = (formData: FormData): Form => {
     // prepare questions
     const questionConnects: { id: string }[] = [];
     const questionCreates: { question: string; active: boolean }[] = [];
@@ -132,9 +138,22 @@ export function CreateAweForm({
       };
     });
 
+    const data: Form = {
+      title: formData.get("title")?.toString() ?? "",
+      description: formData.get("thoughts")?.toString() ?? "",
+      enableImageUpload: Boolean(formData.get("enable_image")) ?? false,
+      enableVideoUpload: Boolean(formData.get("enable_video")) ?? false,
+      enableRating: Boolean(formData.get("enable_rating")) ?? false,
+      questions: { create: questionCreates, connect: questionConnects },
+      createdBy: {
+        connect: {
+          id: session?.data?.user?.id ?? "",
+        },
+      },
+    };
+
     // prepare boards
-    const formBoards: string[] =
-      form?.boards.map((board: Board) => board.id) ?? [];
+    const formBoards: string[] = form?.boardIDs ?? [];
 
     const newSelectedBoards: string[] = [];
     formData.getAll("board").forEach((b) => {
@@ -165,7 +184,7 @@ export function CreateAweForm({
     }
 
     // prepare tags
-    const formTags: string[] = form?.tags.map((tag: Tag) => tag.id) ?? [];
+    const formTags: string[] = form?.tagIDs ?? [];
 
     const newSelectedTags: string[] = [];
     formData.getAll("tag").forEach((t) => {
@@ -187,7 +206,7 @@ export function CreateAweForm({
         }
       });
 
-      // remove boards if not selected
+      // remove tags if not selected
       formTags.forEach((tag) => {
         if (!newSelectedTags.includes(tag)) {
           tagDisconnects.push({ id: tag });
@@ -195,28 +214,22 @@ export function CreateAweForm({
       });
     }
 
-    const data: Prisma.FormUpdateInput = {
-      title: formData.get("title")?.toString() ?? "",
-      description: formData.get("thoughts")?.toString() ?? "",
-      enableImageUpload: Boolean(formData.get("enable_image")) ?? false,
-      enableVideoUpload: Boolean(formData.get("enable_video")) ?? false,
-      enableRating: Boolean(formData.get("enable_rating")) ?? false,
-      questions: { create: questionCreates, connect: questionConnects },
-      createdBy: {
-        connect: {
-          id: session?.data?.user?.id ?? "",
-        },
-      },
-      boards: {
-        connect: boardConnects ?? [],
-        disconnect: boardDisconnects ?? [],
-      },
-      tags: {
-        connect: tagConnects ?? [],
-        disconnect: tagDisconnects ?? [],
-      },
-    };
-    console.log(data);
+    if (newSelectedBoards?.length) {
+      if (boardConnects?.length) {
+        data.boards = { connect: boardConnects };
+      }
+      if (boardDisconnects?.length) {
+        data.boards = { ...data.boards, disconnect: boardDisconnects };
+      }
+    }
+    if (newSelectedTags?.length) {
+      if (tagConnects?.length) {
+        data.tags = { connect: tagConnects };
+      }
+      if (tagDisconnects?.length) {
+        data.tags = { ...data.tags, disconnect: tagDisconnects };
+      }
+    }
 
     return data;
   };
@@ -224,7 +237,7 @@ export function CreateAweForm({
   const handleSubmit = (formData: FormData) => {
     // call server actions
     form?.id?.trim()
-      ? updateForm(form.id, prepareUpdateFormPayload(formData), formData)
+      ? updateForm(form.id, prepareUpdateFormPayload(formData))
       : createTestimonialForm(prepareCreateFormPayload(formData));
     clearForm();
     onSubmit && onSubmit();

@@ -5,12 +5,14 @@ import BoardFormModal from "./navbar/modal/board-modal";
 import TagModal from "./navbar/modal/tag-modal";
 import TestimonialFormModal from "./navbar/modal/testimonial-form-modal";
 import TestimonialModal from "./navbar/modal/testimonial-modal";
+import NewThemeModal from "./navbar/modal/new-theme-modal";
 
 export default function NewButton() {
   const [showNewAweModal, setShowNewAweModal] = useState(false);
   const [showNewTagModal, setShowNewTagModal] = useState(false);
   const [showNewFromModal, setShowNewFormModal] = useState(false);
   const [showBoardFromModal, setShowBoardFormModal] = useState(false);
+  const [showNewThemeModal, setShowNewThemeModal] = useState(false);
 
   return (
     <>
@@ -42,6 +44,11 @@ export default function NewButton() {
               Testimonial Form
             </div>
           </li>
+          <li>
+            <div className="" onClick={() => setShowNewThemeModal(true)}>
+              Theme
+            </div>
+          </li>
         </ul>
       </div>
       {/* Modals */}
@@ -55,6 +62,10 @@ export default function NewButton() {
         setVisible={setShowBoardFormModal}
       />
       <TagModal visible={showNewTagModal} setVisible={setShowNewTagModal} />
+      <NewThemeModal
+        visible={showNewThemeModal}
+        setVisible={setShowNewThemeModal}
+      />
     </>
   );
 }

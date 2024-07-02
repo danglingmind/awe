@@ -1,16 +1,9 @@
 import { Answer, Form, Prisma, Question, Testimonial } from "@prisma/client";
 import RatingInput from "../common/rating";
-import {
-  createTestimonial,
-  testForm,
-} from "@/app/lib/actions/testimonial.actions";
+import { createTestimonial } from "@/app/lib/actions/testimonial.actions";
 import FileUpload from "../common/file-upload";
 import { Placeholders } from "@/app/components/ui/constants";
-import { useState } from "react";
-import test from "node:test";
-import { create } from "domain";
-import { connect } from "http2";
-import { Questrial } from "next/font/google";
+import { useEffect, useState } from "react";
 import Modal from "../common/modal";
 
 export default function TestimonialSubmitFormComponent({
@@ -18,11 +11,13 @@ export default function TestimonialSubmitFormComponent({
 }: {
   form?: Form;
 }) {
+  console.log(form);
   const [answers, setAnswers] = useState<Map<string, Answer>>(
     new Map<string, Answer>()
   );
   const [submitClicked, setSubmitClicked] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [rating, setRating] = useState<number>();
 
   const handleSubmit = async (formData: FormData) => {
     if (!submitClicked) {
@@ -41,7 +36,7 @@ export default function TestimonialSubmitFormComponent({
       ansCreateMany.push({ answer: ans.answer, questionID: queID });
     });
 
-    const testimonial: Prisma.TestimonialCreateInput = {
+    let testimonial: Prisma.TestimonialCreateInput = {
       active: true,
       createdByEmail: formData.get("email")?.toString() ?? "",
       name: formData.get("name")?.toString() ?? "",
@@ -50,13 +45,34 @@ export default function TestimonialSubmitFormComponent({
         formData.get("permissionToShare")?.toString() === "on" ? true : false,
       verified: true,
       owner: { connect: { id: form?.userId ?? "" } },
-      boards: { connect: form?.boardIDs?.map((id) => ({ id })) ?? [] },
-      tags: { connect: form?.tagIDs?.map((id) => ({ id })) ?? [] },
-      answers: { createMany: { data: ansCreateMany } },
     };
 
-    // take the ratings
+    if (form?.boardIDs?.length) {
+      testimonial = {
+        ...testimonial,
+        boards: { connect: form?.boardIDs?.map((id) => ({ id })) ?? [] },
+      };
+    }
+
+    if (form?.tagIDs?.length) {
+      testimonial = {
+        ...testimonial,
+        tags: { connect: form?.tagIDs?.map((id) => ({ id })) ?? [] },
+      };
+    }
+
+    if (ansCreateMany.length) {
+      testimonial = {
+        ...testimonial,
+        answers: { createMany: { data: ansCreateMany } },
+      };
+    }
+
     if (form?.enableRating) {
+      testimonial = {
+        ...testimonial,
+        rating: rating ?? 0,
+      };
     }
     // take the image file
     if (form?.enableImageUpload) {
@@ -140,7 +156,7 @@ export default function TestimonialSubmitFormComponent({
                   <div className="label">
                     <span className="label-text">Rate your experience</span>
                   </div>
-                  <RatingInput />
+                  <RatingInput rating={rating} setRating={setRating} />
                   {/* </label> */}
                 </div>
               )}

@@ -19,7 +19,7 @@ import SideMenu from "./SideMenu";
 
 export default function SideNav({ children }: { children: ReactNode }) {
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer lg:drawer-open shadow-md">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content ">
         <label
@@ -38,17 +38,8 @@ export default function SideNav({ children }: { children: ReactNode }) {
           className="drawer-overlay"
         ></label>
         {/* <SideMenu /> */}
-        <div
-          className="flex flex-col gap-3 justify-between"
-          style={{
-            height: "95vh",
-            scrollbarWidth: "none",
-          }}
-        >
-          <ul
-            className="menu rounded-box mx-4 my-6 bg-base-200 flex flex-col gap-4"
-            // style={{ height: "95vh" }}
-          >
+        <div className="flex flex-col gap-3 justify-between">
+          <ul className="menu rounded-box mx-4 my-6 bg-base-300 flex flex-col gap-4">
             {/* Sidebar content here */}
             <li>
               <Link href={"/dashboard"} className="tooltip" data-tip="home">
